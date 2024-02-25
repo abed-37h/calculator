@@ -1,0 +1,87 @@
+
+
+:root {
+    --key-size: 100px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-size: 40px;
+}
+
+body {
+    height: 100vh;
+}
+
+#main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+#calculator,
+#wrapper,
+#operators {
+    display: flex;
+    flex-direction: column;
+}
+
+#calculator {
+    gap: 12px;
+    margin: 12px;
+    outline: 1px solid black;
+    padding: 12px;
+}
+
+#screen {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    width: calc(4 * var(--key-size) + 5px);
+    height: var(--key-size);
+    outline: 2px solid black;
+}
+
+#result {
+    margin: 12px;
+}
+
+#keyboard {
+    display: flex;
+    width: calc(4 * var(--key-size) + 5px);
+    height: calc(5 * var(--key-size) + 6px);
+    padding: 1px;
+    outline: 2px solid black;
+}
+
+#controls {
+    display: flex;
+    width: 100%;
+}
+
+#numbers {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#keyboard,
+#wrapper,
+#controls,
+#numbers,
+#operators {
+    gap: 1px;
+}
+
+.key {
+    width: var(--key-size);
+    height: var(--key-size);
+}
+
+#clear,
+#num-0 {
+    flex-grow: 1;
+}
