@@ -32,7 +32,7 @@ const TAKE_USER_INPUT = 0;
 const DISPLAY_RESULT = 1;
 const DISPLAY_ERROR = 2;
 
-let calculator = new Calculator(0, '+', null);
+let calculator = new Calculator(0, '+', 0);
 let displayState = TAKE_USER_INPUT;
 
 const display = document.querySelector('#display');
@@ -43,20 +43,20 @@ const clear = document.querySelector('#clear');
 const backspace = document.querySelector('#backspace');
 
 digitsKeyboard.addEventListener('click', (event) => {
-    if (displayState === DISPLAY_ERROR) {
+    if (displayState === DISPLAY_ERROR || event.target == digitsKeyboard) {
         return;
     }
     
     if (displayState === DISPLAY_RESULT) {
-        display.textContent = '0';
+        calculator.inputValue = '0';
         displayState = TAKE_USER_INPUT;
     }
     
-    if (display.textContent === '0' && event.target.textContent !== '.') {
-        display.textContent = '';
+    if (calculator.inputValue == '0' && event.target.textContent !== '.') {
+        calculator.inputValue = '';
     }
     
-    display.textContent = calculator.inputValue = display.textContent + event.target.textContent;
+    display.textContent = calculator.inputValue += event.target.textContent;
 });
 
 dot.addEventListener('click', () => {
@@ -69,15 +69,15 @@ clear.addEventListener('click', () => {
     display.textContent = calculator.inputValue = '0';
     dot.disabled = false;
 
-    displayState = DISPLAY_RESULT;
+    displayState = TAKE_USER_INPUT;
 
-    calculator = new Calculator(0, '+', null);
+    calculator = new Calculator(0, '+', 0);
 });
 
 backspace.addEventListener('click', () => {
     if (displayState !== TAKE_USER_INPUT) return;
 
-    if (display.textContent.endsWith('.')) {
+    if (calculator.inputValue.endsWith('.')) {
         dot.disabled = false;
     }
     
@@ -85,7 +85,7 @@ backspace.addEventListener('click', () => {
 });
 
 operatorsKeyboard.addEventListener('click', (event) => {
-    if (displayState === DISPLAY_ERROR) {
+    if (displayState === DISPLAY_ERROR || event.target == operatorsKeyboard) {
         return;
     }
 
