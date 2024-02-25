@@ -1,19 +1,31 @@
 
 
-function Calculator(a, op, b) {
-    this.a = a;
-    this.op = op;
-    this.b = b;
+const divideByZeroErrorMessages = [
+    'Division by zero: moronic move.',
+    'Infinity chuckles silently.',
+    'Math cringes, nice try!',
+    'Division by zero? Pathetic.',
+    'Infinity\'s secret admirer.',
+    'Mathematics scoffs at you.',
+];
+
+function Calculator(initialValue, operator, inputValue) {
+    this.resultStored = initialValue;
+    this.operator = operator;
+    this.inputValue = inputValue;
     
     this.operations = {
-        '=': (a, b) => a = b,
-        '-': (a, b) => a - b,
-        '+': (a, b) => a + b,
-        '*': (a, b) => a * b,
-        '/': (a, b) => (b == 0) ? "Syntax Error: can't divide by 0" : a / b,
+        '=': () => this.resultStored = this.inputValue,
+        '-': () => this.resultStored -= this.inputValue,
+        '+': () => this.resultStored += this.inputValue,
+        '*': () => this.resultStored *= this.inputValue,
+        '/': () => (this.inputValue == 0) 
+            ? divideByZeroErrorMessages[Math.round(Math.random() * divideByZeroErrorMessages.length)] 
+            : this.resultStored /= this.inputValue,
     };
     
-    this.operate = () => (typeof this.a  === 'number' && typeof this.b === 'number') ? this.operations[this.op](this.a, this.b) : 'Error';
+    this.operate = () => (typeof this.resultStored  === 'number' && typeof this.inputValue === 'number') 
+        ? this.operations[this.operator]() : 'Error';
 }
 
 const TAKE_USER_INPUT = 0;
@@ -44,7 +56,7 @@ digitsKeyboard.addEventListener('click', (event) => {
         display.textContent = '';
     }
     
-    display.textContent += event.target.textContent;
+    display.textContent = calculator.inputValue = display.textContent + event.target.textContent;
 });
 
 dot.addEventListener('click', () => {
@@ -54,23 +66,22 @@ dot.addEventListener('click', () => {
 });
 
 clear.addEventListener('click', () => {
-    display.textContent = '0';
+    display.textContent = calculator.inputValue = '0';
     dot.disabled = false;
+
     displayState = DISPLAY_RESULT;
+
     calculator = new Calculator(0, '+', null);
 });
 
 backspace.addEventListener('click', () => {
     if (displayState !== TAKE_USER_INPUT) return;
+
     if (display.textContent.endsWith('.')) {
         dot.disabled = false;
     }
     
-    display.textContent = display.textContent.slice(0, -1);
-    
-    if (display.textContent === '') {
-        display.textContent = '0';
-    }
+    display.textContent = calculator.inputValue = (calculator.inputValue.length > 1) ? calculator.inputValue.slice(0, -1) : '0';
 });
 
 operatorsKeyboard.addEventListener('click', (event) => {
@@ -78,10 +89,17 @@ operatorsKeyboard.addEventListener('click', (event) => {
         return;
     }
 
-    let op = event.target.textContent;
-    calculator.b = +display.textContent;
+    let operator = event.target.textContent;
+
+    if (calculator.inputValue === null) {
+        calculator.operator = operator;
+        return;
+    }
+
+    calculator.inputValue = +calculator.inputValue;
     const result = calculator.operate();
     display.textContent = result;
+
     if (typeof result === 'number') {
         displayState = DISPLAY_RESULT;
     }
@@ -90,5 +108,6 @@ operatorsKeyboard.addEventListener('click', (event) => {
     }
     
     dot.disabled = false;
-    calculator = new Calculator(result, op, null);
+    calculator.operator = operator;
+    calculator.inputValue = null;
 });
