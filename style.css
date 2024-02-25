@@ -42,7 +42,7 @@ body {
     justify-content: flex-end;
     align-items: flex-end;
     width: calc(4 * var(--key-size) + 5px);
-    height: var(--key-size);
+    height: 150px;
     outline: 2px solid black;
 }
 
