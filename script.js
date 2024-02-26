@@ -9,6 +9,8 @@ const divideByZeroErrorMessages = [
     'Mathematics scoffs at you.',
 ];
 
+const overflowErrorMessage = 'Number Overflow. Shrink display.';
+
 function Calculator(initialValue, operator, inputValue) {
     this.resultStored = initialValue;
     this.operator = operator;
@@ -19,21 +21,17 @@ function Calculator(initialValue, operator, inputValue) {
         '−': () => this.resultStored -= this.inputValue,
         '+': () => this.resultStored += this.inputValue,
         '×': () => this.resultStored *= this.inputValue,
-        '÷': () => (this.inputValue == 0) 
-            ? divideByZeroErrorMessages[Math.round(Math.random() * divideByZeroErrorMessages.length)] 
-            : this.resultStored /= this.inputValue,
+        '÷': () => {
+            errorMessage.textContent = divideByZeroErrorMessages[Math.round(Math.random() * divideByZeroErrorMessages.length)];
+            return (this.inputValue == 0) ? null : this.resultStored /= this.inputValue
+        },
     };
     
     this.operate = () => (typeof this.resultStored  === 'number' && typeof this.inputValue === 'number') 
         ? this.operations[this.operator]() : 'Error';
 }
 
-const TAKE_USER_INPUT = 0;
-const DISPLAY_RESULT = 1;
-const DISPLAY_ERROR = 2;
-
-let calculator = new Calculator(0, '+', '0');
-let displayState = TAKE_USER_INPUT;
+let calculator = new Calculator(0, '+', null);
 
 const errorMessage = document.querySelector('#error-message');
 const display = document.querySelector('#display');
@@ -44,16 +42,18 @@ const clear = document.querySelector('#clear');
 const backspace = document.querySelector('#backspace');
 
 const handleDigit = (digit) => {
-    if (displayState === DISPLAY_RESULT) {
-        calculator.inputValue = '0';
-        displayState = TAKE_USER_INPUT;
-    }
-    
-    if (digitsKeyboard === '.') {
-        dot.disabled = true;
+    if (errorMessage.textContent.length) {
+        return;
     }
 
-    if (calculator.inputValue == '0') {
+    if (calculator.inputValue === null) {
+        calculator.inputValue = '0';
+    }
+    
+    if (digit === '.') {
+        dot.disabled = true;
+    }
+    else if (calculator.inputValue == '0') {
         calculator.inputValue = '';
     }
     
@@ -63,16 +63,13 @@ const handleDigit = (digit) => {
 const clearDisplay = () => {
     display.textContent = calculator.inputValue = '0';
     errorMessage.textContent = '';
-    
     dot.disabled = false;
-
-    displayState = TAKE_USER_INPUT;
-
-    calculator = new Calculator(0, '+', '0');
+    
+    calculator = new Calculator(0, '+', null);
 };
 
 const handleBackspace = () => {
-    if (displayState !== TAKE_USER_INPUT) return;
+    if (calculator.inputValue === null) return;
 
     if (calculator.inputValue.endsWith('.')) {
         dot.disabled = false;
@@ -83,6 +80,10 @@ const handleBackspace = () => {
 };
 
 const handleOperator = (operator) => {
+    if (errorMessage.textContent.length) {
+        return;
+    }
+
     if (calculator.inputValue === null) {
         calculator.operator = operator;
         return;
@@ -95,17 +96,11 @@ const handleOperator = (operator) => {
         result = "" + +(+result).toPrecision(16);
         
         if (result.split('.')[0].length > 16) {
-            errorMessage.textContent = 'Number Overflow. Shrink display.';
-            displayState = DISPLAY_ERROR;
+            errorMessage.textContent = overflowErrorMessage;
         }
         else {
             display.textContent = setPrecision(result);
-            displayState = DISPLAY_RESULT;
         }
-    }
-    else {
-        errorMessage.textContent = result;
-        displayState = DISPLAY_ERROR;
     }
 
     dot.disabled = false;
@@ -114,11 +109,9 @@ const handleOperator = (operator) => {
 };
 
 digitsKeyboard.addEventListener('click', (event) => {
-    if (displayState === DISPLAY_ERROR || event.target == digitsKeyboard) {
-        return;
+    if (event.target != digitsKeyboard) {
+        handleDigit(event.target.textContent);
     }
-
-    handleDigit(event.target.textContent);
 });
 
 clear.addEventListener('click', clearDisplay);
@@ -126,16 +119,12 @@ clear.addEventListener('click', clearDisplay);
 backspace.addEventListener('click', handleBackspace);
 
 operatorsKeyboard.addEventListener('click', (event) => {
-    if (displayState === DISPLAY_ERROR || event.target == operatorsKeyboard) {
-        return;
+    if (event.target != operatorsKeyboard) {
+        handleOperator(event.target.textContent);
     }
-
-    handleOperator(event.target.textContent);
 });
 
 window.addEventListener('keydown', (event) => {
-    event.preventDefault();
-    
     const digits = '0123456789.';
     const operators = '=-+*/';
 
@@ -147,11 +136,12 @@ window.addEventListener('keydown', (event) => {
             case '-': handleOperator('−'); break;
             case '+': handleOperator('+'); break;
             case '*': handleOperator('×'); break;
-            case '/': handleOperator('÷'); break;
+            case '/': handleOperator('÷'); event.preventDefault(); break;
             case '=': handleOperator('='); break;
         }
     }
     else if (event.key === 'Enter') {
+        event.preventDefault();
         handleOperator('=');
     }
     else if (event.key === 'Delete') {
