@@ -35,6 +35,7 @@ const DISPLAY_ERROR = 2;
 let calculator = new Calculator(0, '+', 0);
 let displayState = TAKE_USER_INPUT;
 
+const errorMessage = document.querySelector('#error-message');
 const display = document.querySelector('#display');
 const operatorsKeyboard = document.querySelector('#operators');
 const digitsKeyboard = document.querySelector('#digits');
@@ -67,6 +68,8 @@ dot.addEventListener('click', () => {
 
 clear.addEventListener('click', () => {
     display.textContent = calculator.inputValue = '0';
+    errorMessage.textContent = '';
+    
     dot.disabled = false;
 
     displayState = TAKE_USER_INPUT;
@@ -104,20 +107,19 @@ operatorsKeyboard.addEventListener('click', (event) => {
         result = "" + +(+result).toPrecision(16);
         
         if (result.split('.')[0].length > 16) {
-            result = 'Number Overflow. Shrink display.';
+            errorMessage.textContent = 'Number Overflow. Shrink display.';
             displayState = DISPLAY_ERROR;
         }
         else {
-            result = setPrecision(result);
+            display.textContent = setPrecision(result);
             displayState = DISPLAY_RESULT;
         }
     }
     else {
+        errorMessage.textContent = result;
         displayState = DISPLAY_ERROR;
     }
-    
-    display.textContent = result;
-    
+
     dot.disabled = false;
     calculator.operator = operator;
     calculator.inputValue = null;

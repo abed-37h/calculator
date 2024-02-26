@@ -39,15 +39,21 @@ body {
 
 #screen {
     display: flex;
-    justify-content: flex-end;
-    align-items: flex-end;
+    flex-direction: column;
+    justify-content: space-between;
     width: calc(4 * var(--key-size) + 5px);
     height: calc(1.5 * var(--key-size));
     outline: 2px solid black;
+    padding: 12px;
+}
+
+#error-message {
+    height: 100%;
+    flex-grow: 1;
 }
 
 #display {
-    margin: 12px;
+    align-self: flex-end;
 }
 
 #keyboard {
