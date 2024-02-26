@@ -16,10 +16,10 @@ function Calculator(initialValue, operator, inputValue) {
     
     this.operations = {
         '=': () => this.resultStored = this.inputValue,
-        '-': () => this.resultStored -= this.inputValue,
+        '−': () => this.resultStored -= this.inputValue,
         '+': () => this.resultStored += this.inputValue,
-        '*': () => this.resultStored *= this.inputValue,
-        '/': () => (this.inputValue == 0) 
+        '×': () => this.resultStored *= this.inputValue,
+        '÷': () => (this.inputValue == 0) 
             ? divideByZeroErrorMessages[Math.round(Math.random() * divideByZeroErrorMessages.length)] 
             : this.resultStored /= this.inputValue,
     };

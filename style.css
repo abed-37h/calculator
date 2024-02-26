@@ -9,6 +9,8 @@
     padding: 0;
     box-sizing: border-box;
     font-size: 40px;
+    color: #f0f0f0;
+    font-family: Helvetica Neue, Noto Naskh Arabic UI, Arial, sans-serif;
 }
 
 body {
@@ -21,6 +23,7 @@ body {
     align-items: center;
     height: 100%;
     width: 100%;
+    background-color: #c4bfdf;
 }
 
 #calculator,
@@ -35,33 +38,44 @@ body {
     margin: 12px;
     outline: 1px solid black;
     padding: 12px;
+    background-color: #272323;
+    border-radius: 16px 16px 40px 40px;
 }
 
 #screen {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: calc(4 * var(--key-size) + 5px);
+    width: calc(4 * var(--key-size) + 20px);
     height: calc(1.5 * var(--key-size));
-    outline: 2px solid black;
+    /* outline: 2px solid black; */
     padding: 12px;
+    background-color: #b0bf71;
+    color: #252e31;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px 2px inset;
 }
 
 #error-message {
     height: 100%;
-    flex-grow: 1;
+    color: #993a3a;
+    font-size: 24px;
+    font-family: monospace;
 }
 
 #display {
     align-self: flex-end;
+    color: inherit;
+    font-family: monospace;
 }
 
 #keyboard {
     display: flex;
-    width: calc(4 * var(--key-size) + 5px);
-    height: calc(5 * var(--key-size) + 6px);
-    padding: 1px;
-    outline: 2px solid black;
+    width: calc(4 * var(--key-size) + 20px);
+    height: calc(5 * var(--key-size) + 24px);
+    padding: 4px;
+    background-color: #97aabb;
+    border-radius: 16px 16px 32px 32px;
 }
 
 #controls {
@@ -79,15 +93,42 @@ body {
 #controls,
 #digits,
 #operators {
-    gap: 1px;
+    gap: 4px;
 }
 
 .key {
     width: var(--key-size);
     height: var(--key-size);
+    border-radius: 16px 16px 32px 32px;
+    border: none;
+    box-shadow: 1px 1px 0px 1px rgba(0, 0, 0, 0.5);
+}
+
+.key:active {
+    box-shadow: 1px 1px 0px 1px rgba(0, 0, 0, 0.2) inset;
+}
+
+.control {
+    background-color: #ff2828;
+}
+
+.digit {
+    background-color: #252e31;
+}
+
+.operator {
+    background-color: #6767d5;
 }
 
 #clear,
 #digit-0 {
     flex-grow: 1;
+}
+
+#clear {
+    font-size: 32px;
+}
+
+#backspace {
+    font-size: 48px;
 }
