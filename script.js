@@ -56,7 +56,7 @@ digitsKeyboard.addEventListener('click', (event) => {
         calculator.inputValue = '';
     }
     
-    display.textContent = calculator.inputValue += event.target.textContent;
+    display.textContent = calculator.inputValue = setPrecision(calculator.inputValue +  event.target.textContent);
 });
 
 dot.addEventListener('click', () => {
@@ -81,7 +81,8 @@ backspace.addEventListener('click', () => {
         dot.disabled = false;
     }
     
-    display.textContent = calculator.inputValue = (calculator.inputValue.length > 1) ? calculator.inputValue.slice(0, -1) : '0';
+    display.textContent = calculator.inputValue = (calculator.inputValue.length > 1) 
+        ? calculator.inputValue.slice(0, -1) : '0';
 });
 
 operatorsKeyboard.addEventListener('click', (event) => {
@@ -89,7 +90,7 @@ operatorsKeyboard.addEventListener('click', (event) => {
         return;
     }
 
-    let operator = event.target.textContent;
+    const operator = event.target.textContent;
 
     if (calculator.inputValue === null) {
         calculator.operator = operator;
@@ -97,17 +98,43 @@ operatorsKeyboard.addEventListener('click', (event) => {
     }
 
     calculator.inputValue = +calculator.inputValue;
-    const result = calculator.operate();
-    display.textContent = result;
-
+    let result = calculator.operate();
+    
     if (typeof result === 'number') {
-        displayState = DISPLAY_RESULT;
+        result = "" + +(+result).toPrecision(16);
+        
+        if (result.split('.')[0].length > 16) {
+            result = 'Number Overflow. Shrink display.';
+            displayState = DISPLAY_ERROR;
+        }
+        else {
+            result = setPrecision(result);
+            displayState = DISPLAY_RESULT;
+        }
     }
     else {
         displayState = DISPLAY_ERROR;
     }
     
+    display.textContent = result;
+    
     dot.disabled = false;
     calculator.operator = operator;
     calculator.inputValue = null;
 });
+
+const setPrecision = (toDisplay, precision = 16) => {
+    let split = toDisplay.split('.');
+    const integer = split[0];
+    const decimal = split[1];
+
+    if (split.length === 1 || integer.length === precision) {
+        toDisplay = integer.slice(0, precision);
+        dot.disabled = false;
+    }    
+    else {
+        toDisplay = integer + '.' + decimal.slice(0, precision - integer.length);
+    }
+
+    return toDisplay;
+};
