@@ -32,7 +32,7 @@ const TAKE_USER_INPUT = 0;
 const DISPLAY_RESULT = 1;
 const DISPLAY_ERROR = 2;
 
-let calculator = new Calculator(0, '+', 0);
+let calculator = new Calculator(0, '+', '0');
 let displayState = TAKE_USER_INPUT;
 
 const errorMessage = document.querySelector('#error-message');
@@ -43,30 +43,24 @@ const dot = document.querySelector('#dot');
 const clear = document.querySelector('#clear');
 const backspace = document.querySelector('#backspace');
 
-digitsKeyboard.addEventListener('click', (event) => {
-    if (displayState === DISPLAY_ERROR || event.target == digitsKeyboard) {
-        return;
-    }
-    
+const handleDigit = (digit) => {
     if (displayState === DISPLAY_RESULT) {
         calculator.inputValue = '0';
         displayState = TAKE_USER_INPUT;
     }
     
-    if (calculator.inputValue == '0' && event.target.textContent !== '.') {
+    if (digitsKeyboard === '.') {
+        dot.disabled = true;
+    }
+
+    if (calculator.inputValue == '0') {
         calculator.inputValue = '';
     }
     
-    display.textContent = calculator.inputValue = setPrecision(calculator.inputValue +  event.target.textContent);
-});
+    display.textContent = calculator.inputValue = setPrecision(calculator.inputValue +  digit);
+};
 
-dot.addEventListener('click', () => {
-    if (displayState === TAKE_USER_INPUT) {
-        dot.disabled = true;
-    }
-});
-
-clear.addEventListener('click', () => {
+const clearDisplay = () => {
     display.textContent = calculator.inputValue = '0';
     errorMessage.textContent = '';
     
@@ -74,10 +68,10 @@ clear.addEventListener('click', () => {
 
     displayState = TAKE_USER_INPUT;
 
-    calculator = new Calculator(0, '+', 0);
-});
+    calculator = new Calculator(0, '+', '0');
+};
 
-backspace.addEventListener('click', () => {
+const handleBackspace = () => {
     if (displayState !== TAKE_USER_INPUT) return;
 
     if (calculator.inputValue.endsWith('.')) {
@@ -86,15 +80,9 @@ backspace.addEventListener('click', () => {
     
     display.textContent = calculator.inputValue = (calculator.inputValue.length > 1) 
         ? calculator.inputValue.slice(0, -1) : '0';
-});
+};
 
-operatorsKeyboard.addEventListener('click', (event) => {
-    if (displayState === DISPLAY_ERROR || event.target == operatorsKeyboard) {
-        return;
-    }
-
-    const operator = event.target.textContent;
-
+const handleOperator = (operator) => {
     if (calculator.inputValue === null) {
         calculator.operator = operator;
         return;
@@ -123,6 +111,55 @@ operatorsKeyboard.addEventListener('click', (event) => {
     dot.disabled = false;
     calculator.operator = operator;
     calculator.inputValue = null;
+};
+
+digitsKeyboard.addEventListener('click', (event) => {
+    if (displayState === DISPLAY_ERROR || event.target == digitsKeyboard) {
+        return;
+    }
+
+    handleDigit(event.target.textContent);
+});
+
+clear.addEventListener('click', clearDisplay);
+
+backspace.addEventListener('click', handleBackspace);
+
+operatorsKeyboard.addEventListener('click', (event) => {
+    if (displayState === DISPLAY_ERROR || event.target == operatorsKeyboard) {
+        return;
+    }
+
+    handleOperator(event.target.textContent);
+});
+
+window.addEventListener('keydown', (event) => {
+    event.preventDefault();
+    
+    const digits = '0123456789.';
+    const operators = '=-+*/';
+
+    if (digits.includes(event.key)) {
+        handleDigit(event.key);
+    }
+    else if (operators.includes(event.key)) {
+        switch (event.key) {
+            case '-': handleOperator('−'); break;
+            case '+': handleOperator('+'); break;
+            case '*': handleOperator('×'); break;
+            case '/': handleOperator('÷'); break;
+            case '=': handleOperator('='); break;
+        }
+    }
+    else if (event.key === 'Enter') {
+        handleOperator('=');
+    }
+    else if (event.key === 'Delete') {
+        (event.ctrlKey) ? clearDisplay() : handleBackspace();
+    }
+    else if (event.key === 'Backspace') {
+        (event.ctrlKey) ? clearDisplay() : handleBackspace();
+    }
 });
 
 const setPrecision = (toDisplay, precision = 16) => {
